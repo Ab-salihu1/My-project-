@@ -1,0 +1,124 @@
+// FUSTA Result Management Portal — Database Schema
+// Run: npx prisma migrate dev --name init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  STUDENT
+  LECTURER
+  REGISTRAR
+}
+
+enum Grade {
+  A
+  B
+  C
+  D
+  E
+  F
+}
+
+model User {
+  id           String   @id @default(uuid())
+  email        String   @unique
+  passwordHash String
+  role         Role
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  student   Student? // present only if role = STUDENT
+  lecturer  Lecturer? // present only if role = LECTURER
+
+  refreshTokens RefreshToken[]
+
+  @@map("users")
+}
+
+// A hashed, revocable refresh token per session — lets us log out of one
+// device without killing every session, and lets us revoke on password change.
+model RefreshToken {
+  id        String   @id @default(uuid())
+  tokenHash String   @unique
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  revoked   Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@map("refresh_tokens")
+}
+
+model Student {
+  id           String   @id @default(uuid())
+  matricNo     String   @unique
+  fullName     String
+  department   String
+  level        Int      // 100, 200, 300, 400
+  userId       String   @unique
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  results      Result[]
+  createdAt    DateTime @default(now())
+
+  @@map("students")
+}
+
+model Lecturer {
+  id         String   @id @default(uuid())
+  staffId    String   @unique
+  fullName   String
+  department String
+  userId     String   @unique
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  courses    Course[]
+
+  @@map("lecturers")
+}
+
+model Semester {
+  id        String   @id @default(uuid())
+  name      String   // e.g. "First Semester"
+  session   String   // e.g. "2024/2025"
+  isActive  Boolean  @default(false)
+  results   Result[]
+
+  @@unique([name, session])
+  @@map("semesters")
+}
+
+model Course {
+  id         String   @id @default(uuid())
+  code       String   @unique // e.g. CSC 401
+  title      String
+  unit       Int
+  department String
+  lecturerId String?
+  lecturer   Lecturer? @relation(fields: [lecturerId], references: [id])
+  results    Result[]
+
+  @@map("courses")
+}
+
+model Result {
+  id          String   @id @default(uuid())
+  studentId   String
+  student     Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  courseId    String
+  course      Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  semesterId  String
+  semester    Semester @relation(fields: [semesterId], references: [id], onDelete: Cascade)
+  score       Int      // 0-100
+  grade       Grade
+  gradePoint  Float    // derived from grade, stored for fast GPA queries
+  publishedAt DateTime @default(now())
+  publishedBy String?  // lecturer/registrar userId, for audit trail
+
+  @@unique([studentId, courseId, semesterId]) // one result per course per semester
+  @@map("results")
+}
