@@ -23,10 +23,7 @@ const registerSchema = z.object({
   profile: profileSchema,
 });
 
-const loginSchema = z.object({
-  email: z.string().email(),
-  password: z.string().min(1, "Password is required."),
-});
+const loginSchema = z.object({ email: z.string().trim().email("Invalid email or password."), password: z.string().min(1, "Invalid email or password."), });
 
 // Only registrar staff can create new accounts — students/lecturers don't self-register.
 router.post("/register", requireAuth, requireRole("REGISTRAR"), validate(registerSchema), register);
