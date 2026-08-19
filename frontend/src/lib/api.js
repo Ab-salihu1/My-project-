@@ -24,7 +24,7 @@ async function rawRequest(path, options = {}) {
 }
 
 async function tryRefresh() {
-  const { ok, body } = await rawRequest("/auth/refresh", { method: "POST" });
+  const { ok, body } = await rawRequest("/api/auth/refresh", { method: "POST" });
   if (ok) {
     setAccessToken(body.data.accessToken);
     return true;
@@ -36,7 +36,7 @@ async function tryRefresh() {
 export async function apiRequest(path, options = {}) {
   let result = await rawRequest(path, options);
 
-  if (result.status === 401 && path !== "/auth/refresh") {
+  if (result.status === 401 && path !== "/api/auth/refresh") {
     const refreshed = await tryRefresh();
     if (refreshed) {
       result = await rawRequest(path, options);
@@ -54,15 +54,15 @@ export async function apiRequest(path, options = {}) {
 }
 
 export const api = {
-  login: (email, password) => apiRequest("/auth/login", { method: "POST", body: JSON.stringify({ email, password }) }),
-  logout: () => apiRequest("/auth/logout", { method: "POST" }),
-  register: (payload) => apiRequest("/auth/register", { method: "POST", body: JSON.stringify(payload) }),
+  login: (email, password) => apiRequest("/api/auth/login", { method: "POST", body: JSON.stringify({ email, password }) }),
+  logout: () => apiRequest("/api/auth/logout", { method: "POST" }),
+  register: (payload) => apiRequest("/api/auth/register", { method: "POST", body: JSON.stringify(payload) }),
 
-  myResults: (semesterId) => apiRequest(`/results/me${semesterId ? `?semesterId=${semesterId}` : ""}`),
-  resultsByMatric: (matricNo) => apiRequest(`/results/student/${encodeURIComponent(matricNo)}`),
-  searchStudents: (q) => apiRequest(`/results/students/search?q=${encodeURIComponent(q)}`),
-  publishResult: (payload) => apiRequest("/results", { method: "POST", body: JSON.stringify(payload) }),
+  myResults: (semesterId) => apiRequest(`/api/results/me${semesterId ? `?semesterId=${semesterId}` : ""}`),
+  resultsByMatric: (matricNo) => apiRequest(`/api/results/student/${encodeURIComponent(matricNo)}`),
+  searchStudents: (q) => apiRequest(`/api/results/students/search?q=${encodeURIComponent(q)}`),
+  publishResult: (payload) => apiRequest("/api/results", { method: "POST", body: JSON.stringify(payload) }),
 
-  courses: () => apiRequest("/courses"),
-  semesters: () => apiRequest("/semesters"),
+  courses: () => apiRequest("/api/courses"),
+  semesters: () => apiRequest("/api/semesters"),
 };
