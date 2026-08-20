@@ -64,5 +64,6 @@ export const api = {
   publishResult: (payload) => apiRequest("/api/results", { method: "POST", body: JSON.stringify(payload) }),
 
   courses: () => apiRequest("/api/courses"),
+  createCourse: (payload) => apiRequest("/api/courses", { method: "POST", body: JSON.stringify(payload) }),
   semesters: () => apiRequest("/api/semesters"),
 };
