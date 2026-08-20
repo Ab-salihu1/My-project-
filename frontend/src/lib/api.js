@@ -10,7 +10,7 @@ export function setAccessToken(token) {
 }
 
 async function rawRequest(path, options = {}) {
-  const res = await fetch(`https://absalihu1-fusta-portal.onrender.com/api${path}`, {
+  const res = await fetch(`https://absalihu1-fusta-portal.onrender.com${path}`, {
     ...options,
     headers: {
       "Content-Type": "application/json",
