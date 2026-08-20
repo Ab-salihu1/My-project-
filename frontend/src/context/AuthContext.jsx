@@ -13,8 +13,8 @@ export function AuthProvider({ children }) {
     setError(null);
     try {
       const data = await api.login(email, password);
-      setAccessToken(data.data.accessToken);
-      setUser(data.data.user);
+      setAccessToken(data.accessToken);
+      setUser(data.user);
       return true;
     } catch (err) {
       setError(err.message);
