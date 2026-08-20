@@ -10,14 +10,14 @@ export function setAccessToken(token) {
 }
 
 async function rawRequest(path, options = {}) {
-  const res = await fetch(`/api${path}`, {
+  const res = await fetch(`https://absalihu1-fusta-portal.onrender.com/api${path}`, {
     ...options,
     headers: {
       "Content-Type": "application/json",
       ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
       ...(options.headers || {}),
     },
-    credentials: "include", // sends the refresh cookie
+    credentials: "include", // sends the refresh-token cookie
   });
   const body = await res.json().catch(() => ({}));
   return { ok: res.ok, status: res.status, body };
