@@ -1,15 +1,17 @@
 import React, { useEffect, useState } from "react";
-import { LogOut, Download } from "lucide-react";
+import { LogOut, Download, KeyRound } from "lucide-react";
 import { TOKENS, GRADE_COLOR, classOfDegree } from "../lib/tokens";
 import { useAuth } from "../context/AuthContext";
 import { api } from "../lib/api";
 import Seal from "../components/Seal";
+import ChangePasswordModal from "../components/ChangePasswordModal";
 
 export default function StudentDashboard() {
   const { user, logout } = useAuth();
   const [data, setData] = useState(null);
   const [showStamp, setShowStamp] = useState(false);
   const [error, setError] = useState(null);
+  const [showPasswordModal, setShowPasswordModal] = useState(false);
 
   useEffect(() => {
     api
@@ -49,9 +51,14 @@ export default function StudentDashboard() {
             <div style={{ fontSize: 9.5, letterSpacing: "0.12em", color: TOKENS.goldBright, textTransform: "uppercase" }}>Result Management Portal</div>
           </div>
         </div>
-        <button onClick={logout} style={{ background: "transparent", border: `1px solid ${TOKENS.goldBright}`, color: TOKENS.goldBright, padding: "6px 12px", borderRadius: 3, fontSize: 12, cursor: "pointer", display: "flex", alignItems: "center", gap: 6 }}>
-          <LogOut size={13} /> Sign out
-        </button>
+        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+          <button onClick={() => setShowPasswordModal(true)} style={{ background: "transparent", border: `1px solid ${TOKENS.goldBright}`, color: TOKENS.goldBright, padding: "6px 12px", borderRadius: 3, fontSize: 12, cursor: "pointer", display: "flex", alignItems: "center", gap: 6 }}>
+            <KeyRound size={13} /> Change Password
+          </button>
+          <button onClick={logout} style={{ background: "transparent", border: `1px solid ${TOKENS.goldBright}`, color: TOKENS.goldBright, padding: "6px 12px", borderRadius: 3, fontSize: 12, cursor: "pointer", display: "flex", alignItems: "center", gap: 6 }}>
+            <LogOut size={13} /> Sign out
+          </button>
+        </div>
       </div>
 
       <div style={{ maxWidth: 980, margin: "0 auto", padding: "28px 20px 60px", display: "grid", gridTemplateColumns: "260px 1fr", gap: 24 }}>
@@ -113,6 +120,8 @@ export default function StudentDashboard() {
           </div>
         </div>
       </div>
+
+      {showPasswordModal && <ChangePasswordModal onClose={() => setShowPasswordModal(false)} />}
     </div>
   );
 }

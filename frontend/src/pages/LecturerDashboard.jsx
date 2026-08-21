@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { LogOut, Search, CheckCircle2 } from "lucide-react";
+import { LogOut, Search, CheckCircle2, KeyRound } from "lucide-react";
 import { TOKENS } from "../lib/tokens";
 import { useAuth } from "../context/AuthContext";
 import { api } from "../lib/api";
+import ChangePasswordModal from "../components/ChangePasswordModal";
 
-function Header({ subtitle }) {
+function Header({ subtitle, onChangePassword }) {
   const { logout } = useAuth();
   return (
     <div style={{ background: TOKENS.forestDeep, color: TOKENS.paper, padding: "14px 28px", display: "flex", alignItems: "center", justifyContent: "space-between", borderBottom: `3px solid ${TOKENS.gold}` }}>
@@ -15,9 +16,14 @@ function Header({ subtitle }) {
           <div style={{ fontSize: 9.5, letterSpacing: "0.12em", color: TOKENS.goldBright, textTransform: "uppercase" }}>{subtitle}</div>
         </div>
       </div>
-      <button onClick={logout} style={{ background: "transparent", border: `1px solid ${TOKENS.goldBright}`, color: TOKENS.goldBright, padding: "6px 12px", borderRadius: 3, fontSize: 12, cursor: "pointer", display: "flex", alignItems: "center", gap: 6 }}>
-        <LogOut size={13} /> Sign out
-      </button>
+      <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+        <button onClick={onChangePassword} style={{ background: "transparent", border: `1px solid ${TOKENS.goldBright}`, color: TOKENS.goldBright, padding: "6px 12px", borderRadius: 3, fontSize: 12, cursor: "pointer", display: "flex", alignItems: "center", gap: 6 }}>
+          <KeyRound size={13} /> Change Password
+        </button>
+        <button onClick={logout} style={{ background: "transparent", border: `1px solid ${TOKENS.goldBright}`, color: TOKENS.goldBright, padding: "6px 12px", borderRadius: 3, fontSize: 12, cursor: "pointer", display: "flex", alignItems: "center", gap: 6 }}>
+          <LogOut size={13} /> Sign out
+        </button>
+      </div>
     </div>
   );
 }
@@ -34,8 +40,9 @@ export default function LecturerDashboard() {
   const [courseId, setCourseId] = useState("");
   const [semesterId, setSemesterId] = useState("");
   const [score, setScore] = useState("");
-  const [status, setStatus] = useState(null); // { type: "success"|"error", message }
+  const [status, setStatus] = useState(null);
   const [submitting, setSubmitting] = useState(false);
+  const [showPasswordModal, setShowPasswordModal] = useState(false);
 
   useEffect(() => {
     api.courses().then(setCourses).catch(() => {});
@@ -49,7 +56,7 @@ export default function LecturerDashboard() {
     }
     const timer = setTimeout(() => {
       api.searchStudents(query).then(setMatches).catch(() => {});
-    }, 250); // debounce so we're not hitting the API on every keystroke
+    }, 250);
     return () => clearTimeout(timer);
   }, [query]);
 
@@ -74,7 +81,7 @@ export default function LecturerDashboard() {
 
   return (
     <div style={{ minHeight: "100vh", background: TOKENS.parchment, fontFamily: "'IBM Plex Sans', sans-serif", color: TOKENS.ink }}>
-      <Header subtitle="Lecturer Portal" />
+      <Header subtitle="Lecturer Portal" onChangePassword={() => setShowPasswordModal(true)} />
 
       <div style={{ maxWidth: 640, margin: "0 auto", padding: "28px 20px 60px" }}>
         <div style={{ background: TOKENS.paper, border: `1px solid ${TOKENS.line}`, borderRadius: 4, padding: 24 }}>
@@ -136,6 +143,8 @@ export default function LecturerDashboard() {
           </form>
         </div>
       </div>
+
+      {showPasswordModal && <ChangePasswordModal onClose={() => setShowPasswordModal(false)} />}
     </div>
   );
 }

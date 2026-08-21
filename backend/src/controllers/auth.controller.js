@@ -128,4 +128,20 @@ const logout = catchAsync(async (req, res) => {
   res.json({ success: true, data: null });
 });
 
-module.exports = { register, login, refresh, logout };
+// POST /api/auth/change-password — any logged-in user can change their own password
+const changePassword = catchAsync(async (req, res) => {
+  const { currentPassword, newPassword } = req.body;
+
+  const user = await prisma.user.findUnique({ where: { id: req.user.sub } });
+  if (!user) throw new AppError("User not found.", 404, "NOT_FOUND");
+
+  const valid = await bcrypt.compare(currentPassword, user.passwordHash);
+  if (!valid) throw new AppError("Current password is incorrect.", 401, "INVALID_CREDENTIALS");
+
+  const passwordHash = await bcrypt.hash(newPassword, 12);
+  await prisma.user.update({ where: { id: user.id }, data: { passwordHash } });
+
+  res.json({ success: true, data: { message: "Password updated." } });
+});
+
+module.exports = { register, login, refresh, logout, changePassword };

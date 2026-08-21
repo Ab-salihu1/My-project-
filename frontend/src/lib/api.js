@@ -56,6 +56,7 @@ export async function apiRequest(path, options = {}) {
 export const api = {
   login: (email, password) => apiRequest("/api/auth/login", { method: "POST", body: JSON.stringify({ email, password }) }),
   logout: () => apiRequest("/api/auth/logout", { method: "POST" }),
+  changePassword: (payload) => apiRequest("/api/auth/change-password", { method: "POST", body: JSON.stringify(payload) }),
   register: (payload) => apiRequest("/api/auth/register", { method: "POST", body: JSON.stringify(payload) }),
 
   myResults: (semesterId) => apiRequest(`/api/results/me${semesterId ? `?semesterId=${semesterId}` : ""}`),

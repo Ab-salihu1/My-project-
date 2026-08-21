@@ -1,9 +1,10 @@
 import React, { useState } from "react";
-import { LogOut, Search, UserPlus, CheckCircle2 } from "lucide-react";
+import { LogOut, Search, UserPlus, CheckCircle2, KeyRound } from "lucide-react";
 import { TOKENS, GRADE_COLOR, classOfDegree } from "../lib/tokens";
 import { useAuth } from "../context/AuthContext";
 import { api } from "../lib/api";
 import Seal from "../components/Seal";
+import ChangePasswordModal from "../components/ChangePasswordModal";
 
 const inputStyle = { width: "100%", boxSizing: "border-box", padding: "9px 12px", border: `1px solid ${TOKENS.line}`, borderRadius: 4, fontSize: 13 };
 const labelStyle = { display: "block", fontSize: 11, fontWeight: 600, marginBottom: 4, color: "#6B7268" };
@@ -253,6 +254,7 @@ function CreateCourse() {
 export default function RegistrarDashboard() {
   const { logout } = useAuth();
   const [tab, setTab] = useState("lookup");
+  const [showPasswordModal, setShowPasswordModal] = useState(false);
 
   return (
     <div style={{ minHeight: "100vh", background: TOKENS.parchment, fontFamily: "'IBM Plex Sans', sans-serif" }}>
@@ -264,9 +266,14 @@ export default function RegistrarDashboard() {
             <div style={{ fontSize: 9.5, letterSpacing: "0.12em", color: TOKENS.goldBright, textTransform: "uppercase" }}>Registrar</div>
           </div>
         </div>
-        <button onClick={logout} style={{ background: "transparent", border: `1px solid ${TOKENS.gold}`, color: TOKENS.gold, borderRadius: 4, padding: "6px 12px", cursor: "pointer" }}>
-          <LogOut size={13} /> Sign out
-        </button>
+        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+          <button onClick={() => setShowPasswordModal(true)} style={{ background: "transparent", border: `1px solid ${TOKENS.gold}`, color: TOKENS.gold, borderRadius: 4, padding: "6px 12px", cursor: "pointer" }}>
+            <KeyRound size={13} /> Change Password
+          </button>
+          <button onClick={logout} style={{ background: "transparent", border: `1px solid ${TOKENS.gold}`, color: TOKENS.gold, borderRadius: 4, padding: "6px 12px", cursor: "pointer" }}>
+            <LogOut size={13} /> Sign out
+          </button>
+        </div>
       </div>
 
       <div style={{ maxWidth: 720, margin: "0 auto", padding: "28px 20px 60px" }}>
@@ -280,6 +287,8 @@ export default function RegistrarDashboard() {
 
         {tab === "lookup" ? <TranscriptLookup /> : tab === "create" ? <CreateAccount /> : <CreateCourse />}
       </div>
+
+      {showPasswordModal && <ChangePasswordModal onClose={() => setShowPasswordModal(false)} />}
     </div>
   );
 }
