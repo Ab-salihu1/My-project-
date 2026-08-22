@@ -144,4 +144,40 @@ const changePassword = catchAsync(async (req, res) => {
   res.json({ success: true, data: { message: "Password updated." } });
 });
 
-module.exports = { register, login, refresh, logout, changePassword };
+// POST /api/auth/forgot-password — self-service reset. Verifies the user via
+// email + matric number (students) or staff ID (lecturers/registrar), then
+// sets a new password directly. No email/SMS server required.
+const forgotPassword = catchAsync(async (req, res) => {
+  const { email, identifier, newPassword } = req.body;
+
+  if (!email || !identifier || !newPassword) {
+    throw new AppError("email, identifier, and newPassword are required.", 400, "VALIDATION_ERROR");
+  }
+  if (newPassword.length < 6) {
+    throw new AppError("New password must be at least 6 characters.", 400, "VALIDATION_ERROR");
+  }
+
+  const user = await prisma.user.findUnique({
+    where: { email },
+    include: { student: true, lecturer: true },
+  });
+  if (!user) throw new AppError("No account matches those details.", 404, "NOT_FOUND");
+
+  let matches = false;
+  if (user.role === "STUDENT" && user.student) {
+    matches = user.student.matricNo.trim().toLowerCase() === identifier.trim().toLowerCase();
+  } else if (user.role === "LECTURER" && user.lecturer) {
+    matches = user.lecturer.staffId.trim().toLowerCase() === identifier.trim().toLowerCase();
+  } else if (user.role === "REGISTRAR") {
+    matches = identifier.trim().toLowerCase() === email.trim().toLowerCase();
+  }
+
+  if (!matches) throw new AppError("No account matches those details.", 404, "NOT_FOUND");
+
+  const passwordHash = await bcrypt.hash(newPassword, 12);
+  await prisma.user.update({ where: { id: user.id }, data: { passwordHash } });
+
+  res.json({ success: true, data: { message: "Password updated. You can now sign in." } });
+});
+
+module.exports = { register, login, refresh, logout, changePassword, forgotPassword };

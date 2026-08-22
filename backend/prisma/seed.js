@@ -72,11 +72,17 @@ async function main() {
     },
   });
 
-  // --- Semester ---
+  // --- Semesters ---
   const semester = await prisma.semester.upsert({
     where: { name_session: { name: "First Semester", session: "2024/2025" } },
     update: {},
     create: { name: "First Semester", session: "2024/2025", isActive: true },
+  });
+
+  const semester2 = await prisma.semester.upsert({
+    where: { name_session: { name: "Second Semester", session: "2024/2025" } },
+    update: {},
+    create: { name: "Second Semester", session: "2024/2025", isActive: false },
   });
 
   // --- Courses ---

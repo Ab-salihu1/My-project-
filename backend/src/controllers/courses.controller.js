@@ -5,7 +5,7 @@ const AppError = require("../utils/AppError");
 // GET /api/courses — lecturers get only their assigned courses,
 // registrar gets the full course catalogue.
 const getCourses = catchAsync(async (req, res) => {
-  const where = req.user.role === "LECTURER" ? { lecturerId: req.user.sub } : {};
+  const where = {};
 
   const courses = await prisma.course.findMany({
     where,

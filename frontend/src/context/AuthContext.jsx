@@ -15,10 +15,10 @@ export function AuthProvider({ children }) {
       const data = await api.login(email, password);
       setAccessToken(data.accessToken);
       setUser(data.user);
-      return true;
+      return data.user; // return the user so callers can check its role
     } catch (err) {
       setError(err.message);
-      return false;
+      return null;
     } finally {
       setLoading(false);
     }
@@ -34,7 +34,7 @@ export function AuthProvider({ children }) {
   }
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, loading, error }}>
+    <AuthContext.Provider value={{ user, login, logout, loading, error, setError }}>
       {children}
     </AuthContext.Provider>
   );

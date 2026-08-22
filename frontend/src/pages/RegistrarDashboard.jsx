@@ -161,12 +161,21 @@ function CreateAccount() {
 
             {role === "STUDENT" && (
               <>
-                <label style={labelStyle}>Level</label>
-                <select style={{ ...inputStyle, marginBottom: 14 }} value={level} onChange={(e) => setLevel(e.target.value)}>
-                  {["100", "200", "300", "400", "500"].map((l) => (
-                    <option key={l} value={l}>{l}</option>
-                  ))}
-                </select>
+              <label style={labelStyle}>Level</label>
+<select style={{ ...inputStyle, marginBottom: 14 }} value={level} onChange={(e) => setLevel(e.target.value)}>
+  {[
+    { value: "100", label: "100 Level" },
+    { value: "200", label: "200 Level" },
+    { value: "300", label: "300 Level" },
+    { value: "400", label: "400 Level" },
+    { value: "500", label: "500 Level" },
+    { value: "600", label: "600 Level (PGD)" },
+    { value: "700", label: "700 Level (Masters)" },
+    { value: "800", label: "800 Level (PhD)" },
+  ].map((l) => (
+    <option key={l.value} value={l.value}>{l.label}</option>
+  ))}
+</select>
               </>
             )}
           </>
